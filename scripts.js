@@ -2,7 +2,7 @@
 (function(ng) {
 'use strict';
   
-ng.module('demo', ['selectionModel']);
+ng.module('demo', ['selectionModel', 'dryDemo']);
 
 ng.module('demo').controller('FancyCtrl', function() {
   
