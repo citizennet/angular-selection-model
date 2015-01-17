@@ -154,7 +154,7 @@ angular.module('selectionModel').directive('selectionModel', [
           }
 
           if('checkbox' === smType) {
-            var cb = element.find('input').eq(0);
+            var cb = element.find('input[type=checkbox]').eq(0);
             cb.prop('checked', smItem[selectedAttribute]);
           }
         };
@@ -360,9 +360,9 @@ angular.module('selectionModel').directive('selectionModel', [
 
         element.on('click', handleClick);
         if('checkbox' === smType) {
-          var elCb = element.find('input');
-          if(elCb[0] && 'checkbox' === elCb[0].type) {
-            element.find('input').on('click', handleClick);
+          var elCb = element.find('input[type=checkbox]').eq(0);
+          if(elCb[0]) {
+            elCb.on('click', handleClick);
           }
         }
 
