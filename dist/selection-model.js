@@ -119,8 +119,6 @@ angular.module('selectionModel').directive('selectionModel', [
           , isMultiMode = /^multi(ple)?(-additive)?$/.test(smMode)
           , isModeAdditive = /^multi(ple)?-additive/.test(smMode);
 
-        console.log('smMode:', smMode, isMultiMode, isModeAdditive);
-
         /**
          * The item attribute to track selected status
          *
@@ -322,7 +320,6 @@ angular.module('selectionModel').directive('selectionModel', [
          * checkbox is in.
          */
         var handleClick = function(event) {
-          //console.log('handleClick:', event, isMultiMode, isModeAdditive);
 
           /**
            * Set by the `selectionModelIgnore` directive
