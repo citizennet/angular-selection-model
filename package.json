@@ -1,9 +1,8 @@
 {
   "name": "selection-model",
-  "version": "0.8.3",
+  "version": "0.10.0",
   "description": "Selection model for angularjs, the ngRepeat companion",
-  "main": "index.js",
-  "private": true,
+  "main": "dist/selection-model.js",
   "directories": {
     "test": "test"
   },

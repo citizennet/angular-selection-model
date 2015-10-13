@@ -32,7 +32,7 @@ angular.module('selectionModel').directive('selectionModelIgnore', [
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
-        element.on('click', function(event) {
+        var ignore = function(event) {
           event.selectionModelIgnore = true;
 
           /**
@@ -46,6 +46,12 @@ angular.module('selectionModel').directive('selectionModelIgnore', [
            */
           if(event.originalEvent) {
             event.originalEvent.selectionModelIgnore = true;
+          }
+        };
+
+        element.on('click', function(event) {
+          if(!attrs.selectionModelIgnore || scope.$eval(attrs.selectionModelIgnore)) {
+            ignore(event);
           }
         });
       }
@@ -94,7 +100,7 @@ angular.module('selectionModel').directive('selectionModel', [
          * Note that the 'checkbox' type assumes the first input child element
          * will be the checkbox.
          */
-        var smType = attrs.selectionModelType || defaultType;
+        var smType = scope.$eval(attrs.selectionModelType) || defaultType;
 
         /**
          * The selection mode
@@ -108,7 +114,7 @@ angular.module('selectionModel').directive('selectionModel', [
          * for de-selection without a modifier key (think of `'multi-additive'`
          * as turning every click into a ctrl-click.
          */
-        var smMode = attrs.selectionModelMode || defaultMode
+        var smMode = scope.$eval(attrs.selectionModelMode) || defaultMode
           , isMultiMode = /^multi(ple)?(-additive)?$/.test(smMode)
           , isModeAdditive = /^multi(ple)?-additive/.test(smMode);
 
@@ -118,7 +124,7 @@ angular.module('selectionModel').directive('selectionModel', [
          * Use `selection-model-selected-attribute` to override the default
          * attribute.
          */
-        var selectedAttribute = attrs.selectionModelSelectedAttribute || defaultSelectedAttribute;
+        var selectedAttribute = scope.$eval(attrs.selectionModelSelectedAttribute) || defaultSelectedAttribute;
 
         /**
          * The selected class name
@@ -127,7 +133,7 @@ angular.module('selectionModel').directive('selectionModel', [
          * selected items. Use `selection-model-selected-class` to override the
          * default class name.
          */
-        var selectedClass = attrs.selectionModelSelectedClass || defaultSelectedClass;
+        var selectedClass = scope.$eval(attrs.selectionModelSelectedClass) || defaultSelectedClass;
 
         /**
          * The cleanup strategy
@@ -137,7 +143,7 @@ angular.module('selectionModel').directive('selectionModel', [
          * items to be deselected when they are filtered away, paged away, or
          * otherwise no longer visible on the client.
          */
-        var cleanupStrategy = attrs.selectionModelCleanupStrategy || defaultCleanupStrategy;
+        var cleanupStrategy = scope.$eval(attrs.selectionModelCleanupStrategy) || defaultCleanupStrategy;
 
         /**
          * The change callback
@@ -221,7 +227,7 @@ angular.module('selectionModel').directive('selectionModel', [
         // Strips away filters - this lets us e.g. deselect items that are
         // filtered out
         var getAllItems = function() {
-          return scope.$eval(repeatParts[1].split('|')[0]);
+          return scope.$eval(repeatParts[1].split(/[|=]/)[0]);
         };
 
         // Get us back to a "clean" state. Usually we'll want to skip
@@ -317,10 +323,13 @@ angular.module('selectionModel').directive('selectionModel', [
           }
 
           // Never handle a single click twice.
-          if(event.selectionModelClickHandled) {
+          if(event.selectionModelClickHandled || (event.originalEvent && event.originalEvent.selectionModelClickHandled)) {
             return;
           }
           event.selectionModelClickHandled = true;
+          if(event.originalEvent) {
+            event.originalEvent.selectionModelClickHandled = true;
+          }
 
           var isCtrlKeyDown = event.ctrlKey || event.metaKey || isModeAdditive
             , isShiftKeyDown = event.shiftKey
@@ -351,10 +360,6 @@ angular.module('selectionModel').directive('selectionModel', [
               // that element
               return;
             }
-          }
-
-          if(isCheckboxClick) {
-            event.stopPropagation();
           }
 
           // Select multiple allows for ranges - use shift key
