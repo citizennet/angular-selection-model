@@ -86,7 +86,8 @@ angular.module('selectionModel').directive('selectionModel', [
           , defaultSelectedClass = defaultOptions.selectedClass
           , defaultType = defaultOptions.type
           , defaultMode = defaultOptions.mode
-          , defaultCleanupStrategy = defaultOptions.cleanupStrategy;
+          , defaultCleanupStrategy = defaultOptions.cleanupStrategy
+          , defaultTarget = defaultOptions.target;
 
         /**
          * The selection model type
@@ -100,7 +101,7 @@ angular.module('selectionModel').directive('selectionModel', [
          * Note that the 'checkbox' type assumes the first input child element
          * will be the checkbox.
          */
-        var smType = scope.$eval(attrs.selectionModelType) || defaultType;
+        var smType = attrs.selectionModelType || defaultType;
 
         /**
          * The selection mode
@@ -114,9 +115,11 @@ angular.module('selectionModel').directive('selectionModel', [
          * for de-selection without a modifier key (think of `'multi-additive'`
          * as turning every click into a ctrl-click.
          */
-        var smMode = scope.$eval(attrs.selectionModelMode) || defaultMode
+        var smMode = attrs.selectionModelMode || defaultMode
           , isMultiMode = /^multi(ple)?(-additive)?$/.test(smMode)
           , isModeAdditive = /^multi(ple)?-additive/.test(smMode);
+
+        console.log('smMode:', smMode, isMultiMode, isModeAdditive);
 
         /**
          * The item attribute to track selected status
@@ -124,7 +127,7 @@ angular.module('selectionModel').directive('selectionModel', [
          * Use `selection-model-selected-attribute` to override the default
          * attribute.
          */
-        var selectedAttribute = scope.$eval(attrs.selectionModelSelectedAttribute) || defaultSelectedAttribute;
+        var selectedAttribute = attrs.selectionModelSelectedAttribute || defaultSelectedAttribute;
 
         /**
          * The selected class name
@@ -133,7 +136,7 @@ angular.module('selectionModel').directive('selectionModel', [
          * selected items. Use `selection-model-selected-class` to override the
          * default class name.
          */
-        var selectedClass = scope.$eval(attrs.selectionModelSelectedClass) || defaultSelectedClass;
+        var selectedClass = attrs.selectionModelSelectedClass || defaultSelectedClass;
 
         /**
          * The cleanup strategy
@@ -143,7 +146,16 @@ angular.module('selectionModel').directive('selectionModel', [
          * items to be deselected when they are filtered away, paged away, or
          * otherwise no longer visible on the client.
          */
-        var cleanupStrategy = scope.$eval(attrs.selectionModelCleanupStrategy) || defaultCleanupStrategy;
+        var cleanupStrategy = attrs.selectionModelCleanupStrategy || defaultCleanupStrategy;
+
+        /**
+         * The target element
+         *
+         * Which element triggers a selection, by default it'll be the ngRepeat
+         * but user can also specify 'checkbox' and only clicking the checkbox will
+         * trigger a selection event.
+         */
+        var target = attrs.selectionModelTarget || defaultTarget;
 
         /**
          * The change callback
@@ -170,7 +182,7 @@ angular.module('selectionModel').directive('selectionModel', [
          * the selected items. Note that order is not guarenteed and any items
          * added to this array programmatically are ignored.
          */
-        var selectedItemsList = scope.$eval(attrs.selectionModelSelectedItems);
+        var selectedItemsList = attrs.selectionModelSelectedItems;
 
         /**
          * The last-click stack id
@@ -310,6 +322,7 @@ angular.module('selectionModel').directive('selectionModel', [
          * checkbox is in.
          */
         var handleClick = function(event) {
+          //console.log('handleClick:', event, isMultiMode, isModeAdditive);
 
           /**
            * Set by the `selectionModelIgnore` directive
@@ -363,7 +376,7 @@ angular.module('selectionModel').directive('selectionModel', [
           }
 
           // Select multiple allows for ranges - use shift key
-          if(isShiftKeyDown && isMultiMode && !isCheckboxClick) {
+          if(isShiftKeyDown && isMultiMode/* && !isCheckboxClick*/) {
             // Use ctrl+shift for additive ranges
             if(!isCtrlKeyDown) {
               scope.$apply(function() {
@@ -418,11 +431,16 @@ angular.module('selectionModel').directive('selectionModel', [
           }
         };
 
-        element.on('click', handleClick);
-        if('checkbox' === smType) {
-          var elCb = element.find('input[type=checkbox]').eq(0);
-          if(elCb[0]) {
-            elCb.on('click', handleClick);
+        if('checkbox' === target) {
+          element.find('input[type=checkbox]').eq(0).on('click', handleClick);
+        }
+        else {
+          element.on('click', handleClick);
+          if('checkbox' === smType) {
+            var elCb = element.find('input[type=checkbox]').eq(0);
+            if(elCb[0]) {
+              elCb.on('click', handleClick);
+            }
           }
         }
 
@@ -467,7 +485,7 @@ angular.module('selectionModel').directive('selectionModel', [
 /**
  * Default options for the selection model directive
  *
- * 
+ *
  *
  * @package selectionModel
  */
@@ -480,7 +498,8 @@ angular.module('selectionModel').provider('selectionModelOptions', [function() {
     selectedClass: 'selected',
     type: 'basic',
     mode: 'single',
-    cleanupStrategy: 'none'
+    cleanupStrategy: 'none',
+    target: 'element'
   };
 
   this.set = function(userOpts) {

@@ -1,5 +1,5 @@
 {
-  "predef": ["angular"],
+  "predef": ["angular", "console"],
   "browser": true,
   "bitwise": true,
   "camelcase": false,
