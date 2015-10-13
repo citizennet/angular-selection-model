@@ -101,7 +101,7 @@ angular.module('selectionModel').directive('selectionModel', [
          *
          * To be executed whenever the item's selected state changes.
          */
-        var smOnChange = attrs.selectionModelOnChange;
+        var smOnChange = scope.$eval(attrs.selectionModelOnChange);
 
         /**
          * The list of items
@@ -121,7 +121,7 @@ angular.module('selectionModel').directive('selectionModel', [
          * the selected items. Note that order is not guarenteed and any items
          * added to this array programmatically are ignored.
          */
-        var selectedItemsList = attrs.selectionModelSelectedItems;
+        var selectedItemsList = scope.$eval(attrs.selectionModelSelectedItems);
 
         /**
          * The last-click stack id
