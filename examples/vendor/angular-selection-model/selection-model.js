@@ -160,7 +160,7 @@ angular.module('selectionModel').directive('selectionModel', [
          *
          * To be executed whenever the item's selected state changes.
          */
-        var smOnChange = scope.$eval(attrs.selectionModelOnChange);
+        var smOnChange = attrs.selectionModelOnChange;
 
         /**
          * The list of items
