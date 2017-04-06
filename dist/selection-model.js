@@ -32,7 +32,16 @@ angular.module('selectionModel').directive('selectionModelIgnore', [
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
-        var ignore = function(event) {
+        function selectionModelIgnoreTag() {}
+        scope.__tag = new selectionModelIgnoreTag();
+
+        element.on('click', handleClick);
+
+        scope.$on('$destroy', function() {
+          element.off('click', handleClick);
+        });
+
+        function ignore(event) {
           event.selectionModelIgnore = true;
 
           /**
@@ -49,11 +58,11 @@ angular.module('selectionModel').directive('selectionModelIgnore', [
           }
         };
 
-        element.on('click', function(event) {
+        function handleClick() {
           if(!attrs.selectionModelIgnore || scope.$eval(attrs.selectionModelIgnore)) {
             ignore(event);
           }
-        });
+        }
       }
     };
   }
@@ -74,6 +83,8 @@ angular.module('selectionModel').directive('selectionModel', [
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
+        function selectionModelTag() {}
+        scope.__tag = new selectionModelTag();
 
         /**
          * Defaults from the options provider
@@ -454,6 +465,20 @@ angular.module('selectionModel').directive('selectionModel', [
             updateSelectedItemsList();
             if(smOnChange && oldSelectedStatus) {
               scope.$eval(smOnChange);
+            }
+
+            // Clean up listeners and closure variables
+            if('checkbox' === target) {
+              element.off('input[type=checkbox]').off('click', handleClick);
+            }
+            else {
+              element.off('click', handleClick);
+              if('checkbox' === smType) {
+                var elCb = element.find('input[type=checkbox]').eq(0);
+                if(elCb[0]) {
+                  elCb.off('click', handleClick);
+                }
+              }
             }
           });
         }
