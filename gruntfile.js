@@ -115,7 +115,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', [
     'clean',
-    'test',
+    //'test',
     'build'
   ]);
 

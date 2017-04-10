@@ -18,7 +18,16 @@ angular.module('selectionModel').directive('selectionModelIgnore', [
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
-        var ignore = function(event) {
+        function selectionModelIgnoreTag() {}
+        scope.__tag = new selectionModelIgnoreTag();
+
+        element.on('click', handleClick);
+
+        scope.$on('$destroy', function() {
+          element.off('click', handleClick);
+        });
+
+        function ignore(event) {
           event.selectionModelIgnore = true;
 
           /**
@@ -35,11 +44,11 @@ angular.module('selectionModel').directive('selectionModelIgnore', [
           }
         };
 
-        element.on('click', function(event) {
+        function handleClick() {
           if(!attrs.selectionModelIgnore || scope.$eval(attrs.selectionModelIgnore)) {
             ignore(event);
           }
-        });
+        }
       }
     };
   }

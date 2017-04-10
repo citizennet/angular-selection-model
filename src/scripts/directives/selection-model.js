@@ -13,6 +13,8 @@ angular.module('selectionModel').directive('selectionModel', [
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
+        function selectionModelTag() {}
+        scope.__tag = new selectionModelTag();
 
         /**
          * Defaults from the options provider
@@ -393,6 +395,20 @@ angular.module('selectionModel').directive('selectionModel', [
             updateSelectedItemsList();
             if(smOnChange && oldSelectedStatus) {
               scope.$eval(smOnChange);
+            }
+
+            // Clean up listeners and closure variables
+            if('checkbox' === target) {
+              element.off('input[type=checkbox]').off('click', handleClick);
+            }
+            else {
+              element.off('click', handleClick);
+              if('checkbox' === smType) {
+                var elCb = element.find('input[type=checkbox]').eq(0);
+                if(elCb[0]) {
+                  elCb.off('click', handleClick);
+                }
+              }
             }
           });
         }
